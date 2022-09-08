@@ -1,0 +1,366 @@
+---
+title: "Case Study: How Does a Bike-Share Navigate Speedy Success?"
+author: "Samir Tak"
+date: "2022-08-27"
+output: html_document
+---
+
+# **Introduction**
+>This is my version of the case study provided in [Google Data Analytics Capstone: Complete a Case Study](https://www.coursera.org/learn/google-data-analytics-capstone)  
+>
+>* I have applied the 6 Steps for the Data Analysis  
+>  
+>  1) [**Ask**]
+>      * [***Scenario***]
+>      * [***Guiding Questions-1***]
+>  2) [**Prepare**] 
+>      * [***Guiding Questions-2***]
+>  3) [**Process**]
+>      * [***Code***]
+>      * [***Guiding Questions-3***]
+>  4) [**Analyze**]
+>      * [***Visualizations***]
+>      * [***Guiding Questions-4***]
+>  5) [**Share**]
+>      * [***Guiding Questions-5***]
+>  6) [**Act**]
+>      * [***Guiding Questions-6***]
+>
+  
+<br/>
+
+# **Ask**
+
+>### ***Scenario***
+>>You are a junior data analyst working in the marketing analyst team at Cyclistic, a bike-share company in Chicago. The director of marketing believes the company’s future success depends on maximizing the number of annual memberships. Therefore, your team wants to understand how casual riders and annual members use Cyclistic bikes dierently. From these insights, your team will design a new marketing strategy to convert casual riders into annual members. But first, Cyclistic executives must approve your recommendations, so they must be backed up with compelling data insights and professional data visualizations.  
+>>
+>><h4> **Characters and teams** </h4>  
+>>
+>>* **Cyclistic:** A bike-share program that features more than 5,800 bicycles and 600 docking stations. Cyclistic sets itself apart by also oering reclining bikes, hand tricycles, and cargo bikes, making bike-share more inclusive to people with disabilities and riders who can’t use a standard two-wheeled bike. The majority of riders opt for traditional bikes; about 8% of riders use the assistive options. Cyclistic users are more likely to ride for leisure, but about 30% use them to commute to work each day.  
+>>* **Lily Moreno:** The director of marketing and your manager. Moreno is responsible for the development of campaigns and initiatives to promote the bike-share program. These may include email, social media, and other channels. Cyclistic marketing analytics team: A team of data analysts who are responsible for collecting, analyzing, and reporting data that helps guide Cyclistic marketing strategy. You joined this team six months ago and have been busy learning about Cyclistic’s mission and business goals — as well as how you, as a junior data analyst, can help Cyclistic achieve them.  
+>>* **Cyclistic executive team:** The notoriously detail-oriented executive team will decide whether to approve the recommended marketing program. 
+>
+> 
+>
+><h4>***Moreno has assigned the question to answer:** How do annual members and casual riders use Cyclistic bikes differently?*</h4>
+>
+>### ***Guiding Questions-1***
+>>**What is the problem you are trying to solve?**  
+>>
+>>* Design a new marketing strategy to convert casual riders into annual members.  
+>>
+>>**How can your insights drive business decisions?**  
+>>
+>>* Insights will help the market analyst team to make right decisions in their strategies to gain more annual members.
+  
+<br/>
+
+# **Prepare**
+>### ***Guiding Questions-2***
+>>**Where is the data located?**  
+>>
+>>* Last 12 months cyclists dataset is used from here: [Cyclistic trip data](https://divvy-tripdata.s3.amazonaws.com/index.html)  
+>>
+>>**How is the data organized?**  
+>>
+>>* The data has been organized monthly.
+>>
+>>**Are there issues with bias or credibility in this data?**
+>>
+>>* The data is Reliabl, Original, Current (till the last month) and Comprehensive. Also it has been cited. So, the data **ROCCC's**
+>>
+>>**How are you addressing licensing, privacy, security, and accessibility?**
+>>
+>>* The data has been made available by Motivate International Inc. under this [license](https://ride.divvybikes.com/data-license-agreement). 
+>>* Riders’ personally identifiable information are not being used.
+>>* This is a public data that can be used to explore how different customer types are using Cyclistic bikes.
+>>
+>>**How did you verify the data’s integrity?**
+>>
+>>* The dataset have consistent columns with correct data formats.
+>>
+>>**How does it help you answer your question?**
+>>
+>>* The monthly dataset contains the information regarding the time spent on cycling with the starting and ending locations. Which would help to get the desired insights.
+>>
+>>**Are there any problems with the data?**
+>>
+>>* The data does not contain the starting and ending locations of majority of the riders.
+
+<br/>
+
+# **Process**
+
+>### ***Code***
+>> Here, as the dataset have lots of null values in the Started and Ending Locations, Python is used to fill the null values based on the latitude and longitude.
+>> The file can be accessed from [here]()
+>>
+>After proccessing and combing the Dataset into a new csv, few operarions are performed in R.
+>
+>### Calling Libraries
+>
+>>```{r Libraries, message=FALSE}
+>>library(tidyverse)
+>>library(dplyr)
+>>library(lubridate)
+>>library(timetk)
+>>library(scales)
+>>library(ggplot2)
+>>```
+>
+>### Initializing Data
+>
+>>```{r Initializing Data}
+>>df = read_csv('last_year_trip.csv')
+>>head(df)
+>>```
+>### Changing Datatype
+>
+>>```{r Changing Datatype}
+>>df$started_at <- as.POSIXct(df$started_at, format = "%Y-%m-%d %H:%M:%S")
+>>df$ended_at <- as.POSIXct(df$ended_at, format = "%Y-%m-%d %H:%M:%S")
+>>```
+>
+>### Creating new year_month column
+>
+>>```{r new column}
+>>df <- df %>%
+>>  mutate(year_month = paste(strftime(df$started_at, "%Y"),
+>>                            "-",
+>>                            strftime(df$started_at, "%m"),
+>>                            paste("(",strftime(df$started_at, "%b"), ")", sep="")))
+>>unique(df$year_month)
+>>df<-df[!(df$year_month=="2022 - 08 (Aug)"),]
+>>```
+><br/>
+>
+>### ***Guiding Questions-3***
+>>**What tools are you choosing and why?**
+>>
+>>* I have used Python and R for transforming and cleaning the data. Because machine learning algorithm is used to fill up the null values of location using the latitude and longitude of the respective. And coombined all the csv files to make a new csv file.
+>>
+>>**Have you ensured your data’s integrity?**
+>>
+>>* The Integrity of the data is maintained all over the process of cleaning and transformation.
+>>
+>>**What steps have you taken to ensure that your data is clean?**
+>>
+>>* I have dropped the unnecessary columns and made required columns, also took care of the null values throughout the data.
+>>
+>>**How can you verify that your data is clean and ready to analyze?**
+>>
+>>* The data does not contain any null values, and the length of the duration of the cycles being used is calculated in the new column. It does not contain any type of bias.
+>>
+>>**Have you documented your cleaning process so you can review and share those results?**
+>>
+>>* The Process has been documented in 2 files. One for Python (.ipynb) and one regarding R (.rmd). 
+>
+<br/>
+
+# **Analyze**
+
+>### ***Visualizations***
+>>```{r Total Members}
+>>ggplot(data = df) +
+>>  geom_bar(mapping = aes(x = member_casual, fill = member_casual)) +
+>>  geom_text(stat='count', aes(label= ..count.., x = member_casual, vjust=-0.5)) +
+>>  scale_y_continuous(labels = comma) +
+>>  ggtitle('Total Casual and Member') +
+>>  xlab("Subscriptions")
+>>```
+>>
+>>```{r Rideables}
+>>ggplot(data = df) +
+>>  geom_bar(mapping = aes(x = rideable_type, fill = member_casual)) +
+>>  ggtitle('Rideables VS Total') +
+>>  geom_text(stat='count', aes(label= ..count.., x=rideable_type, vjust=-0.5)) +
+>>  scale_y_continuous(labels = comma) +
+>>  xlab("Bikes")
+>>```
+>>
+>>```{r Monthly Customers, fig.width=21, fig.height=8}
+>>df <- df[!(is.na(df$year_month)), ]
+>>ggplot(data = df) +
+>>  geom_bar(mapping = aes(x = year_month, fill=member_casual)) +
+>>  geom_text(stat='count', aes(label= ..count.., x=year_month, vjust=-0.5)) +
+>>  ggtitle('Customers VS Months') +
+>>  xlab("Months") + 
+>>  ylab("Costumers")
+>>```
+>>
+>>```{r Duration_Calc, message=FALSE}
+>>df$time_str = str_sub(df$total_time,-8)
+>>df$time = as.POSIXct(df$time_str, format = "%H:%M:%S")
+>>
+>>
+>>a <- df$time %>% 
+>>  between_time(as.POSIXct("00:00:00", format = "%H:%M:%S"), as.POSIXct("00:10:00", format = "%H:%M:%S")) %>% sum()
+>>b <- df$time %>% 
+>>  between_time(as.POSIXct("00:10:00", format = "%H:%M:%S"), as.POSIXct("00:20:00", format = "%H:%M:%S")) %>% sum()
+>>c <- df$time %>% 
+>>  between_time(as.POSIXct("00:20:00", format = "%H:%M:%S"), as.POSIXct("00:30:00", format = "%H:%M:%S")) %>% sum()
+>>d <- df$time %>% 
+>>  between_time(as.POSIXct("00:30:00", format = "%H:%M:%S"), as.POSIXct("00:40:00", format = "%H:%M:%S")) %>% sum()
+>>e <- df$time %>% 
+>>  between_time(as.POSIXct("00:40:00", format = "%H:%M:%S"), as.POSIXct("00:50:00", format = "%H:%M:%S")) %>% sum()
+>>f <- df$time %>% 
+>>  between_time(as.POSIXct("00:50:00", format = "%H:%M:%S"), as.POSIXct("01:00:00", format = "%H:%M:%S")) %>% sum()
+>>g <- df$time %>% 
+>>  between_time(as.POSIXct("01:00:00", format = "%H:%M:%S"), as.POSIXct("01:10:00", format = "%H:%M:%S")) %>% sum()
+>>h <- df$time %>% 
+>>  between_time(as.POSIXct("01:10:00", format = "%H:%M:%S"), as.POSIXct("01:20:00", format = "%H:%M:%S")) %>% sum()
+>>i <- df$time %>% 
+>>  between_time(as.POSIXct("01:20:00", format = "%H:%M:%S"), as.POSIXct("01:30:00", format = "%H:%M:%S")) %>% sum()
+>>
+>>
+>>df_time <- data.frame(
+>>  time_range <- c("0", "10", "20", "30", "40", "50", "60", "70", "80"),
+>>  frequency<-c(a,b,c,d,e,f,g,h,i)
+>>)
+>>```
+>>
+>>```{r Time}
+>>dt<- aggregate(x = df$time, by = list(df$member_casual), FUN=mean)
+>>
+>>dt$mean_time = format(as.POSIXct(dt$x), format = "%H:%M:%S")
+>>
+>>
+>>ggplot(data = dt) +
+>>  geom_col(mapping = aes(x = Group.1, y= mean_time)) +
+>>  xlab("Groups") + 
+>>  ylab("Mean Time") +
+>>  ggtitle('Group VS Average Time')
+>>```
+>>
+>>```{r Duration, message=FALSE}
+>>ggplot(data = df_time) +
+>>  geom_smooth(mapping = aes(x = time_range, y=frequency, group=1)) +
+>>  scale_y_continuous(labels = comma) +
+>>  xlab("Minutes") + 
+>>  ylab("Costumers") +
+>>  ggtitle('Duration VS Frequency')
+>>```
+>>
+>>```{r Weekday}
+>>df$weekday <- weekdays(df$started_at)
+>>ggplot(data = df) +
+>>  geom_bar(mapping = aes(x = weekday, fill=member_casual)) +
+>>  geom_text(stat='count', aes(label= ..count.., x=weekday, vjust=-0.5)) +
+>>  ggtitle('Customers VS Weekdays') +
+>>  xlab("Weekday") + 
+>>  ylab("Costumers")
+>>
+>>```
+>>
+>>```{r Most Frequent Location, out.width="200%"}
+>>df <- transform(df, freq=ave(seq(nrow(df)), start_station_name, FUN=length))
+>>df1 <- df[!(is.na(df$start_station_name)), ]
+>>df1<-df1[order(df1$freq, decreasing = TRUE), ]
+>>
+>>new_df <- df1[!duplicated(df1$start_station_name), ]
+>>new_df <- head(new_df)
+>>
+>>ggplot(data = new_df) +
+>>  geom_col(mapping = aes(x = start_station_name, y=freq, fill=start_station_name)) +
+>>  ggtitle('Most Frequent Locations') +
+>>  xlab("Locations") + 
+>>  ylab("Frequencies")
+>>
+>>```
+>>
+>>```{r Least Frequent Location, out.width="200%"}
+>>df <- transform(df, freq=ave(seq(nrow(df)), start_station_name, FUN=length))
+>>df1 <- df[!(is.na(df$start_station_name)), ]
+>>df1<-df1[order(df1$freq, decreasing = FALSE), ]
+>>
+>>new_df <- df1[!duplicated(df1$start_station_name), ]
+>>new_df <- head(new_df)
+>>
+>>ggplot(data = new_df) +
+>>  geom_col(mapping = aes(x = start_station_name, y=freq, fill=start_station_name)) +
+>>  ggtitle('Least Frequent Locations') +
+>>  xlab("Locations") + 
+>>  ylab("Frequencies")
+>>
+>>```
+>
+><br/>
+>
+>### ***Guiding Questions-4***
+>>
+>>**How should you organize your data to perform analysis on it?**
+>>
+>>* The data should be stored at a single file. The datatypes should be relevant.
+>>
+>>**Has your data been properly formatted?**
+>>
+>>* Yes, the data itself is stored in csv file format and the dates along with the time duration have DateTime format.
+>>
+>>**What surprises did you discover in the data?**
+>>
+>>* Customers tend to use cycle less often during winters. Thus, there is a drop in the sales during the winters.
+>>
+>>**What trends or relationships did you find in the data?**
+>>
+>>* Majorly, people prefer to use bicycles for around 10 minutes. Most of them use in their leisure time.
+>>
+>>**How will these insights help answer your business questions?**
+>>
+>>* The analysis will help to get the idea of the trend amongst the customers, and the market strategist will get a glimpse >>about when to increase marketing approach.
+
+<br/>
+
+# **Share**
+>
+>### ***Guiding Questions-5***
+>>**Were you able to answer the question of how annual members and casual riders use Cyclistic bikes differently?**
+>>
+>>* On an average, Annual Members prefer to use cycle for 20-25 minutes.
+>>
+>>**What story does your data tell?**
+>>
+>>* The popularity amongst people gets low during winters, so need to focus on the seasonal marketing.
+>>
+>>**How do your findings relate to your original question?**
+>>
+>>* From my findings we can see a clear image between frequency/duration/time of both members and casuals. And the reason can also be concluded that why people prefer membership
+>>
+>>**Who is your audience? What is the best way to communicate with them?**
+>>
+>>* MOreno and her team, so the best way would be to present the visualization charts in ppt or a markdown file like this.
+>>
+>>**Can data visualization help you share your findings?**
+>>
+>>* Yes, data visualization plays a key role in making understand the audience about the findings (insights) from the dataset.
+>>
+
+<br/>
+
+# **Act**
+>
+>### ***Guiding Questions-6***
+>>
+>>**What is your final conclusion based on your analysis?**
+>>
+>>* To increase the membership, marketing team should focus on the locations where the people are using cycles less often. Should focus on the individuals who has a duration of using bicycle, of more than 15 minutes on a regular basis.
+>>
+>>**How could your team and business apply your insights?**
+>>
+>>* As said earlier, the insights shows the weakspots of the cycle market, during winters not many people use bicycle for transportation. So, rather marketting should be done over Summers, where the demand is comparitively higher.
+>>
+>>**What next steps would you or your stakeholders take based on your findings?**
+>>
+>>* Use Social Media advertisement to show the people (of least frequent locations) about the Company (cycle providers) and lucerative deals, so they purchase Membership over casual ridings.
+>>
+>>**Is there additional data you could use to expand on your findings?**
+>>
+>>* The Temperature dataset of Chicago would have been useful, as it would help to get a clear correlation between weather and frequency of usage. Also, during Aug, the frequency of people was less, because of the sudden spike of Covid cases during that time. So, covid-19 dataset would also be beneficial for the overall insights.
+
+<br/>
+
+# **Findings**
+>***So, the Stakeholders should more focus to increase their marketing during Summers, as more people prefer to have a ride during Summers.***
+>
+>***Should reach out to the people of least frequency of cycle usage locations.***
+>
+>***Focus on the people, who tend to spend more than 20 minutes on bicycle, if they are not members, using emails or messages.***
